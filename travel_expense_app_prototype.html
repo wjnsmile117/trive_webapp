@@ -1,0 +1,2020 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>旅遊記帳 App</title>
+  <style>
+    :root {
+      --bg: #f4f1ed;
+      --panel: #ffffff;
+      --panel-soft: #f6f0ea;
+      --panel-soft-2: #efe8df;
+      --border: #ddd5cc;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --muted-2: #8b8b8b;
+      --brand-1: #b7b7a4;
+      --brand-2: #a5a58d;
+      --brand-3: #cb997e;
+      --chip: rgba(255,255,255,.18);
+      --shadow: 0 12px 30px rgba(0,0,0,.08);
+      --shadow-sm: 0 6px 18px rgba(0,0,0,.06);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Noto Sans TC", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      background: transparent;
+    }
+
+    .shell {
+      max-width: 420px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 12px;
+      background: var(--bg);
+    }
+
+    .phone {
+      overflow: hidden;
+      background: linear-gradient(180deg, #faf7f3 0%, #fffdfb 100%);
+      border: 1px solid var(--border);
+      border-radius: 32px;
+      min-height: calc(100vh - 24px);
+      box-shadow: 0 18px 40px rgba(0,0,0,.08);
+      position: relative;
+    }
+
+    .notch {
+      width: 80px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--border);
+      margin: 8px auto 0;
+    }
+
+    .app {
+      padding: 14px 14px 110px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: #fff;
+      display: grid;
+      place-items: center;
+      color: #6b5e55;
+    }
+
+    .brand-icon {
+      background: #ede6de;
+      border: 0;
+    }
+
+    .title-center {
+      text-align: center;
+      flex: 1;
+    }
+
+    .title-center small {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .title-center h1 {
+      margin: 2px 0 0;
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    .card {
+      background: var(--panel);
+      border-radius: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .current-trip {
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 28px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--brand-1), var(--brand-2), var(--brand-3));
+      box-shadow: var(--shadow);
+    }
+
+    .current-trip .label,
+    .current-trip .sub {
+      font-size: 11px;
+      color: rgba(255,255,255,.78);
+    }
+
+    .current-trip .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      margin-top: 6px;
+    }
+
+    .current-trip h2 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.3;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      line-height: 1;
+      background: rgba(255,255,255,.18);
+      color: inherit;
+      white-space: nowrap;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .stats-box {
+      background: rgba(255,255,255,.15);
+      border-radius: 18px;
+      padding: 10px;
+      backdrop-filter: blur(6px);
+    }
+
+    .stats-box .k {
+      font-size: 10px;
+      color: rgba(255,255,255,.76);
+    }
+
+    .stats-box .v {
+      margin-top: 3px;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .section-wrap {
+      margin-top: 14px;
+      border-radius: 28px;
+      padding: 12px;
+      background: var(--panel-soft-2);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .section-header h3 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .section-header p {
+      margin: 2px 0 0;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .btn {
+      height: 34px;
+      padding: 0 14px;
+      border-radius: 16px;
+      background: var(--brand-2);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .btn.outline {
+      background: #fff;
+      border: 1px solid var(--border);
+      color: #5f5f5f;
+    }
+
+    .btn.small {
+      height: 32px;
+      padding: 0 12px;
+      font-size: 12px;
+    }
+
+    .flight-card {
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      background: rgba(200,182,166,.22);
+      padding: 12px;
+    }
+
+    .flight-head,
+    .flight-route {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .flight-head .mini {
+      font-size: 11px;
+      color: #6b7280;
+      letter-spacing: .16em;
+    }
+
+    .flight-airline {
+      margin-top: 4px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .flight-no,
+    .flight-time {
+      font-size: 11px;
+      color: #6b7280;
+    }
+
+    .flight-route {
+      margin-top: 10px;
+      background: rgba(255,255,255,.58);
+      padding: 10px 12px;
+      border-radius: 18px;
+    }
+
+    .airport {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .airport-sub {
+      font-size: 10px;
+      color: #6b7280;
+      margin-top: 2px;
+    }
+
+    .tab-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .day-strip {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin: 12px -2px 0;
+      padding-inline: 2px;
+      scrollbar-width: none;
+    }
+    .day-strip::-webkit-scrollbar { display: none; }
+
+    .day-chip {
+      min-width: 112px;
+      padding: 10px 12px;
+      border-radius: 22px;
+      border: 1px solid var(--border);
+      background: #fff;
+      text-align: left;
+      flex: 0 0 auto;
+    }
+
+    .day-chip.active {
+      background: var(--brand-2);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .day-chip .mini {
+      font-size: 10px;
+      color: inherit;
+      opacity: .78;
+    }
+
+    .day-chip .date {
+      margin-top: 4px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .day-chip .count {
+      margin-top: 2px;
+      font-size: 10px;
+      color: inherit;
+      opacity: .78;
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .itinerary-card,
+    .expense-card,
+    .member-card,
+    .analytics-card {
+      border-radius: 24px;
+      background: #fff;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .itinerary-card {
+      padding: 12px;
+      border: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .drag-handle {
+      flex: 0 0 auto;
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: #94a3b8;
+      background: #fff;
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .itinerary-main {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .itinerary-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .itinerary-title {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.35;
+      margin: 0;
+      color: var(--text);
+    }
+
+    .muted-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+
+    .ticket-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 8px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #efe8df;
+      color: #7b6254;
+      font-size: 10px;
+    }
+
+    .expense-card,
+    .member-card,
+    .analytics-card {
+      padding: 14px;
+    }
+
+    .expense-head,
+    .member-head,
+    .top-expense-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .expense-name,
+    .member-name,
+    .top-expense-name {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .expense-sub,
+    .member-sub,
+    .top-expense-sub {
+      margin-top: 3px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .amount-foreign {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .amount-twd {
+      margin-top: 3px;
+      font-weight: 700;
+      font-size: 14px;
+      text-align: right;
+    }
+
+    .member-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: #ede6de;
+      font-size: 24px;
+    }
+
+    .member-row-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-align: left;
+      flex: 1;
+    }
+
+    .top-expense-row {
+      padding: 10px 12px;
+      border-radius: 18px;
+      background: var(--panel-soft);
+    }
+
+    .rank {
+      width: 28px;
+      height: 28px;
+      border-radius: 12px;
+      background: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      flex: 0 0 auto;
+    }
+
+    .chart-box {
+      height: 180px;
+      margin-top: 8px;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .fake-line,
+    .fake-bars,
+    .fake-pie {
+      width: 100%;
+      height: 100%;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(246,240,234,.95));
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fake-line svg,
+    .fake-pie svg,
+    .fake-bars svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 420px;
+      padding: 8px 16px 16px;
+      z-index: 30;
+    }
+
+    .bottom-nav-inner {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      padding: 6px;
+      border-radius: 26px;
+      background: rgba(255,255,255,.96);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-item {
+      min-height: 52px;
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .nav-item.active {
+      background: #e6ded3;
+      color: #6b5e55;
+    }
+
+    .sheet,
+    .dialog {
+      position: fixed;
+      inset: 0;
+      display: none;
+      z-index: 40;
+    }
+
+    .sheet.show,
+    .dialog.show {
+      display: block;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15,23,42,.28);
+    }
+
+    .sheet-panel {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 100%;
+      max-width: 420px;
+      transform: translateX(-50%);
+      background: #fff;
+      border-top-left-radius: 28px;
+      border-top-right-radius: 28px;
+      max-height: 88vh;
+      overflow-y: auto;
+      padding: 18px 16px 28px;
+      box-shadow: 0 -18px 40px rgba(0,0,0,.12);
+    }
+
+    .dialog-panel {
+      position: absolute;
+      inset: 50% auto auto 50%;
+      transform: translate(-50%, -50%);
+      width: calc(100% - 32px);
+      max-width: 388px;
+      background: #fff;
+      border-radius: 28px;
+      padding: 18px 16px 18px;
+      box-shadow: 0 24px 50px rgba(0,0,0,.14);
+      max-height: 88vh;
+      overflow-y: auto;
+    }
+
+    .panel-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0 0 16px;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .form-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: #52525b;
+      font-weight: 600;
+    }
+
+    .input,
+    .select,
+    .textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      border-radius: 16px;
+      padding: 12px 14px;
+      outline: none;
+    }
+
+    .textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .preview-box {
+      padding: 12px;
+      border-radius: 22px;
+      background: var(--panel-soft);
+    }
+
+    .emoji-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .emoji-btn {
+      height: 56px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+    }
+
+    .emoji-btn.active {
+      border-color: var(--brand-2);
+      background: #efe8df;
+    }
+
+    .hidden { display: none !important; }
+
+    .menu-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .trip-list-item {
+      width: 100%;
+      padding: 14px;
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      background: #fff;
+      text-align: left;
+    }
+
+    .trip-list-item.active {
+      border-color: #c8b6a6;
+      background: #f6f0ea;
+    }
+
+    .row-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .screen.hidden-screen {
+      display: none;
+    }
+
+    .invite-box {
+      border-radius: 18px;
+      padding: 12px;
+      background: var(--panel-soft);
+    }
+
+    .dragging {
+      opacity: .55;
+    }
+
+    @media (max-width: 360px) {
+      .analytics-grid { grid-template-columns: 1fr; }
+      .form-row-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="app">
+        <section id="home-screen" class="screen">
+          <div class="topbar">
+            <button class="icon-btn" id="open-trip-menu" aria-label="打開旅遊項目選單">
+              ☰
+            </button>
+            <div class="title-center">
+              <small>手機版正式雛形</small>
+              <h1>旅遊記帳 App</h1>
+            </div>
+            <button class="icon-btn brand-icon" aria-label="品牌圖示">✈️</button>
+          </div>
+
+          <section class="current-trip" id="current-trip-card"></section>
+
+          <section id="flight-section" class="section-wrap hidden"></section>
+          <section id="itinerary-section" class="hidden"></section>
+          <section id="expenses-section" class="hidden"></section>
+          <section id="members-section" class="hidden"></section>
+          <section id="analytics-section" class="hidden"></section>
+        </section>
+
+        <section id="edit-screen" class="screen hidden-screen"></section>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav" id="bottom-nav">
+    <div class="bottom-nav-inner" id="bottom-nav-inner"></div>
+  </nav>
+
+  <div class="sheet" id="trip-menu-sheet">
+    <div class="overlay" data-close="trip-menu-sheet"></div>
+    <div class="sheet-panel">
+      <h2 class="panel-title">旅遊項目</h2>
+      <div class="menu-list" id="trip-menu-list"></div>
+      <div style="margin-top:16px;">
+        <button class="btn" style="width:100%;" id="open-add-trip-dialog">＋ 新增旅遊項目</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="dialog" id="trip-dialog">
+    <div class="overlay" data-close="trip-dialog"></div>
+    <div class="dialog-panel">
+      <h2 class="panel-title">新增旅遊項目</h2>
+      <div class="form-grid">
+        <div class="field"><label>旅程名稱</label><input class="input" id="trip-title" /></div>
+        <div class="form-row-2">
+          <div class="field"><label>開始日期</label><input type="date" class="input" id="trip-start-date" /></div>
+          <div class="field"><label>結束日期</label><input type="date" class="input" id="trip-end-date" /></div>
+        </div>
+        <div class="form-row-2">
+          <div class="field">
+            <label>幣別</label>
+            <select class="select" id="trip-currency">
+              <option value="JPY">JPY</option>
+              <option value="KRW">KRW</option>
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+            </select>
+          </div>
+          <div class="field"><label>匯率</label><input type="number" class="input" id="trip-fx-rate" value="0.22" /></div>
+        </div>
+        <button class="btn" id="submit-add-trip">建立旅程</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet" id="ticket-sheet">
+    <div class="overlay" data-close="ticket-sheet"></div>
+    <div class="sheet-panel">
+      <h2 class="panel-title">編輯航班資訊</h2>
+      <div id="ticket-form"></div>
+      <div style="margin-top:16px;"><button class="btn" style="width:100%;" id="save-ticket-btn">儲存航班</button></div>
+    </div>
+  </div>
+
+  <div class="sheet" id="day-sheet">
+    <div class="overlay" data-close="day-sheet"></div>
+    <div class="sheet-panel">
+      <h2 class="panel-title">新增日期</h2>
+      <div class="form-grid">
+        <div class="field"><label>日期</label><input type="date" class="input" id="new-day-date" /></div>
+        <div class="preview-box" id="day-preview-box">請選擇日期</div>
+        <button class="btn" id="save-day-btn">加入這一天</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet" id="itinerary-sheet">
+    <div class="overlay" data-close="itinerary-sheet"></div>
+    <div class="sheet-panel">
+      <h2 class="panel-title">新增行程卡片</h2>
+      <div class="form-grid">
+        <div class="field"><label>所在天數</label><select class="select" id="new-itinerary-day"></select></div>
+        <div class="field"><label>行程名稱</label><input class="input" id="new-itinerary-title" placeholder="例如：淺草寺" /></div>
+        <div class="form-row-2">
+          <div class="field"><label>開始時間</label><input type="time" class="input" id="new-itinerary-start" /></div>
+          <div class="field"><label>結束時間</label><input type="time" class="input" id="new-itinerary-end" /></div>
+        </div>
+        <div class="field"><label>地點</label><input class="input" id="new-itinerary-location" placeholder="地點" /></div>
+        <div class="field"><label>門票</label><input type="number" class="input" id="new-itinerary-ticket" value="0" /></div>
+        <div class="field"><label>備註</label><textarea class="textarea" id="new-itinerary-note" placeholder="備註"></textarea></div>
+        <button class="btn" id="save-itinerary-btn">新增行程卡片</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet" id="expense-sheet">
+    <div class="overlay" data-close="expense-sheet"></div>
+    <div class="sheet-panel">
+      <h2 class="panel-title">新增支出</h2>
+      <div class="form-grid">
+        <div class="field"><label>日期</label><input type="date" class="input" id="expense-date" /></div>
+        <div class="field"><label>店名</label><input class="input" id="expense-merchant" /></div>
+        <div class="field"><label>品項</label><input class="input" id="expense-item" /></div>
+        <div class="field"><label>外幣金額</label><input type="number" class="input" id="expense-foreign" /></div>
+        <div class="form-row-2">
+          <div class="field"><label>類別</label><select class="select" id="expense-category"></select></div>
+          <div class="field"><label>支付方式</label><select class="select" id="expense-payment"></select></div>
+        </div>
+        <div class="field"><label>旅伴</label><select class="select" id="expense-member"></select></div>
+        <div class="field"><label>備註</label><textarea class="textarea" id="expense-note"></textarea></div>
+        <button class="btn" id="save-expense-btn">加入支出</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet" id="receipt-sheet">
+    <div class="overlay" data-close="receipt-sheet"></div>
+    <div class="sheet-panel">
+      <h2 class="panel-title">拍照翻譯收據</h2>
+      <div class="form-grid">
+        <div class="field"><label>上傳收據</label><input type="file" class="input" id="receipt-file" accept="image/*" /></div>
+        <div class="preview-box" id="receipt-preview-box">尚未選擇收據</div>
+        <div class="preview-box">
+          <p style="margin:0 0 10px;font-size:14px;font-weight:700;">辨識結果</p>
+          <div class="form-grid">
+            <input class="input" id="receipt-merchant" placeholder="店名" />
+            <input class="input" id="receipt-item" placeholder="品項" />
+            <div class="form-row-2">
+              <input type="number" class="input" id="receipt-foreign" placeholder="外幣金額" />
+              <input type="number" class="input" id="receipt-twd" placeholder="台幣金額" />
+            </div>
+            <textarea class="textarea" id="receipt-note" placeholder="翻譯備註"></textarea>
+          </div>
+        </div>
+        <button class="btn" id="save-receipt-btn">匯入支出</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet" id="member-sheet">
+    <div class="overlay" data-close="member-sheet"></div>
+    <div class="sheet-panel">
+      <h2 class="panel-title" id="member-sheet-title">新增旅伴</h2>
+      <div class="form-grid">
+        <div class="field"><label>旅伴名稱</label><input class="input" id="member-name" placeholder="例如：小花" /></div>
+        <div class="field">
+          <label>選擇頭像</label>
+          <div class="emoji-grid" id="emoji-grid"></div>
+        </div>
+        <button class="btn" id="save-member-btn">新增旅伴</button>
+        <button class="btn outline hidden" id="delete-member-btn">刪除此旅伴</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const categories = ["交通", "住宿", "餐飲", "購物", "門票", "咖啡", "伴手禮", "其他"];
+    const payments = ["現金", "信用卡", "行動支付", "交通卡"];
+    const emojiOptions = ["🐻", "🐰", "🐶", "🐱", "🦊", "🐼", "🐯", "🐸", "🦁", "🐨", "🐵", "🐹", "🌷", "⭐", "🍓", "☁️"];
+    const chartColors = ["#8d9b8a", "#b7b7a4", "#a5a58d", "#cb997e", "#ddbea9", "#b56576", "#6d6875", "#adc178"];
+
+    const initialTrips = [
+      {
+        id: "trip-1",
+        title: "東京春季自由行",
+        startDate: "2026-04-20",
+        endDate: "2026-04-25",
+        dayPlans: ["2026-04-20", "2026-04-21", "2026-04-22"],
+        ticketInfo: {
+          outbound: { departAirport: "TPE", arriveAirport: "NRT", airline: "STARLUX", flightNo: "JX802", departTime: "08:30", arriveTime: "12:45" },
+          inbound: { departAirport: "NRT", arriveAirport: "TPE", airline: "STARLUX", flightNo: "JX803", departTime: "16:10", arriveTime: "19:05" },
+        },
+        currency: "JPY",
+        fxRate: 0.22,
+        members: [
+          { id: "m1", name: "我", avatar: "🐻" },
+          { id: "m2", name: "旅伴A", avatar: "🐰" },
+          { id: "m3", name: "旅伴B", avatar: "🐶" },
+        ],
+        itinerary: [
+          { id: "it-1", title: "淺草寺 + 仲見世通", dayDate: "2026-04-20", startTime: "10:00", endTime: "12:00", location: "東京都台東區淺草", note: "可安排和服拍照，午餐吃天丼", ticket: 0 },
+          { id: "it-2", title: "晴空塔", dayDate: "2026-04-20", startTime: "15:00", endTime: "17:00", location: "東京晴空塔", note: "建議先預約時段", ticket: 2100 },
+          { id: "it-3", title: "新宿逛街", dayDate: "2026-04-21", startTime: "14:00", endTime: "18:00", location: "新宿", note: "藥妝、百貨、晚餐", ticket: 0 },
+          { id: "it-4", title: "上野公園散步", dayDate: "2026-04-21", startTime: "09:30", endTime: "11:30", location: "上野公園", note: "早上先去賞景，再去阿美橫町", ticket: 0 },
+          { id: "it-5", title: "迪士尼海洋", dayDate: "2026-04-22", startTime: "08:00", endTime: "20:00", location: "東京迪士尼海洋", note: "先搶快速通關，晚上看表演", ticket: 8900 },
+        ],
+        expenses: [
+          { id: "ex-1", date: "2026-04-20", merchant: "Skyliner", item: "車票", category: "交通", foreignAmount: 2470, currency: "JPY", twdAmount: 543, paymentMethod: "信用卡", memberId: "m1", note: "機場往上野" },
+          { id: "ex-2", date: "2026-04-20", merchant: "淺草今半", item: "午餐", category: "餐飲", foreignAmount: 3200, currency: "JPY", twdAmount: 704, paymentMethod: "現金", memberId: "m2", note: "壽喜燒套餐" },
+          { id: "ex-3", date: "2026-04-21", merchant: "Don Quijote", item: "藥妝", category: "購物", foreignAmount: 8900, currency: "JPY", twdAmount: 1958, paymentMethod: "信用卡", memberId: "m1", note: "防曬、零食、面膜" },
+          { id: "ex-4", date: "2026-04-21", merchant: "東京晴空塔", item: "門票", category: "門票", foreignAmount: 2100, currency: "JPY", twdAmount: 462, paymentMethod: "行動支付", memberId: "m3", note: "展望台門票" },
+        ],
+      },
+      {
+        id: "trip-2",
+        title: "首爾快閃 3 天",
+        startDate: "2026-05-10",
+        endDate: "2026-05-12",
+        dayPlans: ["2026-05-10", "2026-05-11", "2026-05-12"],
+        ticketInfo: {
+          outbound: { departAirport: "TPE", arriveAirport: "ICN", airline: "KOREAN AIR", flightNo: "KE692", departTime: "09:10", arriveTime: "12:40" },
+          inbound: { departAirport: "ICN", arriveAirport: "TPE", airline: "KOREAN AIR", flightNo: "KE691", departTime: "18:20", arriveTime: "19:55" },
+        },
+        currency: "KRW",
+        fxRate: 0.024,
+        members: [
+          { id: "m1", name: "我", avatar: "🐻" },
+          { id: "m2", name: "旅伴A", avatar: "🐰" },
+          { id: "m3", name: "旅伴B", avatar: "🐶" },
+        ],
+        itinerary: [],
+        expenses: [],
+      },
+    ];
+
+    const state = {
+      trips: structuredClone(initialTrips),
+      selectedTripId: initialTrips[0].id,
+      activeTab: "itinerary",
+      screen: "home",
+      selectedDay: initialTrips[0].dayPlans[0],
+      editingItineraryId: null,
+      editingMemberId: null,
+      selectedEmoji: "🐻",
+      collabSettings: {
+        allowInvite: true,
+        inviteCode: "TRIP-2026-88",
+        inviteLink: "travel-app.demo/invite/TRIP-2026-88",
+      },
+      receiptImageUrl: null,
+    };
+
+    const els = {
+      currentTripCard: document.getElementById("current-trip-card"),
+      flightSection: document.getElementById("flight-section"),
+      itinerarySection: document.getElementById("itinerary-section"),
+      expensesSection: document.getElementById("expenses-section"),
+      membersSection: document.getElementById("members-section"),
+      analyticsSection: document.getElementById("analytics-section"),
+      bottomNavInner: document.getElementById("bottom-nav-inner"),
+      homeScreen: document.getElementById("home-screen"),
+      editScreen: document.getElementById("edit-screen"),
+      tripMenuList: document.getElementById("trip-menu-list"),
+      dayPreviewBox: document.getElementById("day-preview-box"),
+      ticketForm: document.getElementById("ticket-form"),
+      emojiGrid: document.getElementById("emoji-grid"),
+      memberSheetTitle: document.getElementById("member-sheet-title"),
+      receiptPreviewBox: document.getElementById("receipt-preview-box"),
+      deleteMemberBtn: document.getElementById("delete-member-btn"),
+    };
+
+    function getSelectedTrip() {
+      return state.trips.find((trip) => trip.id === state.selectedTripId) || state.trips[0];
+    }
+
+    function currency(value, code = "TWD") {
+      return new Intl.NumberFormat("zh-TW", {
+        style: "currency",
+        currency: code,
+        maximumFractionDigits: code === "JPY" || code === "KRW" ? 0 : 2,
+      }).format(Number(value || 0));
+    }
+
+    function formatMonthDay(dateStr) {
+      if (!dateStr) return "未設定";
+      const date = new Date(dateStr);
+      const week = ["日", "一", "二", "三", "四", "五", "六"];
+      return `${date.getMonth() + 1}/${date.getDate()}（${week[date.getDay()]}）`;
+    }
+
+    function formatTimeRange(startTime, endTime) {
+      if (!startTime && !endTime) return "未設定時間";
+      if (!endTime) return startTime;
+      if (!startTime) return endTime;
+      return `${startTime} - ${endTime}`;
+    }
+
+    function totalTwd(trip) {
+      return trip.expenses.reduce((sum, cur) => sum + Number(cur.twdAmount || 0), 0);
+    }
+
+    function totalForeign(trip) {
+      return trip.expenses.reduce((sum, cur) => sum + Number(cur.foreignAmount || 0), 0);
+    }
+
+    function groupedDays(trip) {
+      return trip.dayPlans.map((date) => ({
+        date,
+        items: trip.itinerary.filter((item) => item.dayDate === date),
+      }));
+    }
+
+    function memberSummary(trip) {
+      return trip.members.map((member) => ({
+        ...member,
+        total: trip.expenses.filter((x) => x.memberId === member.id).reduce((sum, cur) => sum + Number(cur.twdAmount || 0), 0),
+      }));
+    }
+
+    function topExpenses(trip) {
+      return [...trip.expenses].sort((a, b) => Number(b.twdAmount) - Number(a.twdAmount)).slice(0, 10);
+    }
+
+    function dailyTrend(trip) {
+      const grouped = {};
+      trip.expenses.forEach((cur) => {
+        grouped[cur.date] = (grouped[cur.date] || 0) + Number(cur.twdAmount || 0);
+      });
+      return Object.entries(grouped).map(([date, amount]) => ({ date, amount }));
+    }
+
+    function categoryStats(trip) {
+      const grouped = {};
+      trip.expenses.forEach((cur) => {
+        grouped[cur.category] = (grouped[cur.category] || 0) + Number(cur.twdAmount || 0);
+      });
+      return Object.entries(grouped).map(([name, value]) => ({ name, value }));
+    }
+
+    function paymentStats(trip) {
+      const grouped = {};
+      trip.expenses.forEach((cur) => {
+        grouped[cur.paymentMethod] = (grouped[cur.paymentMethod] || 0) + Number(cur.twdAmount || 0);
+      });
+      return Object.entries(grouped).map(([name, amount]) => ({ name, amount }));
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.add("show");
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("show");
+    }
+
+    function closeAllModals() {
+      document.querySelectorAll('.sheet.show, .dialog.show').forEach((node) => node.classList.remove('show'));
+    }
+
+    function iconEmoji(name) {
+      const map = {
+        itinerary: "🗓️",
+        expenses: "💸",
+        members: "👥",
+        analytics: "📊",
+      };
+      return map[name] || "•";
+    }
+
+    function renderBottomNav() {
+      const items = [
+        { key: "itinerary", label: "行程" },
+        { key: "expenses", label: "支出" },
+        { key: "members", label: "旅伴" },
+        { key: "analytics", label: "分析" },
+      ];
+      els.bottomNavInner.innerHTML = items.map((item) => `
+        <button class="nav-item ${state.activeTab === item.key ? 'active' : ''}" data-tab="${item.key}">
+          <span>${iconEmoji(item.key)}</span>
+          <span>${item.label}</span>
+        </button>
+      `).join('');
+      els.bottomNavInner.querySelectorAll('[data-tab]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.activeTab = btn.dataset.tab;
+          render();
+        });
+      });
+    }
+
+    function renderCurrentTrip() {
+      const trip = getSelectedTrip();
+      els.currentTripCard.innerHTML = `
+        <p class="label">目前旅遊</p>
+        <div class="row">
+          <div>
+            <h2>${trip.title}</h2>
+            <p class="sub">${trip.startDate} ～ ${trip.endDate} ・ ${Math.max(trip.dayPlans.length, 1)} 天</p>
+          </div>
+          <span class="badge">${trip.currency}</span>
+        </div>
+        <div class="stats-grid">
+          <div class="stats-box">
+            <div class="k">總消費</div>
+            <div class="v">${currency(totalTwd(trip), 'TWD')}</div>
+          </div>
+          <div class="stats-box">
+            <div class="k">外幣總額</div>
+            <div class="v">${currency(totalForeign(trip), trip.currency)}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderFlightSection() {
+      const trip = getSelectedTrip();
+      const visible = state.activeTab === 'itinerary';
+      els.flightSection.classList.toggle('hidden', !visible);
+      if (!visible) return;
+      els.flightSection.innerHTML = `
+        <div class="section-header">
+          <div>
+            <h3>航班資訊</h3>
+            <p>來回資訊可編輯</p>
+          </div>
+          <button class="btn small" id="edit-ticket-btn">✏️ 編輯</button>
+        </div>
+        <div class="list">
+          ${renderFlightCard('去程', trip.ticketInfo.outbound)}
+          ${renderFlightCard('回程', trip.ticketInfo.inbound)}
+        </div>
+      `;
+      document.getElementById('edit-ticket-btn').addEventListener('click', () => {
+        renderTicketForm();
+        openModal('ticket-sheet');
+      });
+    }
+
+    function renderFlightCard(label, ticketInfo) {
+      return `
+        <div class="flight-card">
+          <div class="flight-head">
+            <div>
+              <div class="mini">${label}</div>
+              <div class="flight-airline">${ticketInfo.airline}</div>
+              <div class="flight-no">${ticketInfo.flightNo}</div>
+            </div>
+            <div class="flight-time">
+              <div>${ticketInfo.departTime}</div>
+              <div>${ticketInfo.arriveTime}</div>
+            </div>
+          </div>
+          <div class="flight-route">
+            <div>
+              <div class="airport">${ticketInfo.departAirport}</div>
+              <div class="airport-sub">起飛</div>
+            </div>
+            <div>✈️</div>
+            <div style="text-align:right;">
+              <div class="airport">${ticketInfo.arriveAirport}</div>
+              <div class="airport-sub">抵達</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTicketForm() {
+      const trip = getSelectedTrip();
+      els.ticketForm.innerHTML = `
+        ${renderTicketFormBlock('去程', 'outbound', trip.ticketInfo.outbound)}
+        ${renderTicketFormBlock('回程', 'inbound', trip.ticketInfo.inbound)}
+      `;
+    }
+
+    function renderTicketFormBlock(title, key, data) {
+      return `
+        <div class="preview-box" style="margin-bottom:12px;">
+          <p style="margin:0 0 10px;font-size:14px;font-weight:700;">${title}</p>
+          <div class="form-row-2">
+            <div class="field"><label>起飛機場</label><input class="input ticket-input" data-round="${key}" data-key="departAirport" value="${data.departAirport}" /></div>
+            <div class="field"><label>抵達機場</label><input class="input ticket-input" data-round="${key}" data-key="arriveAirport" value="${data.arriveAirport}" /></div>
+          </div>
+          <div class="form-row-2" style="margin-top:12px;">
+            <div class="field"><label>航空公司</label><input class="input ticket-input" data-round="${key}" data-key="airline" value="${data.airline}" /></div>
+            <div class="field"><label>航班</label><input class="input ticket-input" data-round="${key}" data-key="flightNo" value="${data.flightNo}" /></div>
+          </div>
+          <div class="form-row-2" style="margin-top:12px;">
+            <div class="field"><label>起飛時間</label><input type="time" class="input ticket-input" data-round="${key}" data-key="departTime" value="${data.departTime}" /></div>
+            <div class="field"><label>抵達時間</label><input type="time" class="input ticket-input" data-round="${key}" data-key="arriveTime" value="${data.arriveTime}" /></div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderItinerarySection() {
+      const trip = getSelectedTrip();
+      const visible = state.activeTab === 'itinerary';
+      els.itinerarySection.classList.toggle('hidden', !visible);
+      if (!visible) return;
+
+      const days = groupedDays(trip);
+      els.itinerarySection.innerHTML = `
+        <div class="section-header" style="margin-top:14px;">
+          <div>
+            <h3>行程總覽</h3>
+            <p>先新增日期，再把卡片掛進對應天數</p>
+          </div>
+          <div class="tab-actions">
+            <button class="btn outline small" id="add-day-btn">📅 新增天數</button>
+            <button class="btn small" id="add-itinerary-btn">＋ 新增行程</button>
+          </div>
+        </div>
+        <div class="day-strip">
+          ${days.map((day, index) => `
+            <button class="day-chip ${state.selectedDay === day.date ? 'active' : ''}" data-day="${day.date}">
+              <div class="mini">DAY ${index + 1}</div>
+              <div class="date">${formatMonthDay(day.date)}</div>
+              <div class="count">${day.items.length} 個行程</div>
+            </button>
+          `).join('')}
+        </div>
+        <div class="list" id="itinerary-list">
+          ${days.find((d) => d.date === state.selectedDay)?.items.map(renderItineraryCard).join('') || ''}
+        </div>
+      `;
+
+      document.getElementById('add-day-btn').addEventListener('click', () => openModal('day-sheet'));
+      document.getElementById('add-itinerary-btn').addEventListener('click', () => {
+        populateItineraryDayOptions();
+        openModal('itinerary-sheet');
+      });
+
+      els.itinerarySection.querySelectorAll('[data-day]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.selectedDay = btn.dataset.day;
+          renderItinerarySection();
+        });
+      });
+
+      attachItineraryCardEvents();
+      attachDragAndDrop();
+    }
+
+    function renderItineraryCard(item) {
+      return `
+        <div class="itinerary-card" data-id="${item.id}" draggable="true">
+          <div class="drag-handle" title="長按後拖拉">⋮⋮</div>
+          <button class="itinerary-main open-itinerary" data-id="${item.id}">
+            <div class="itinerary-top">
+              <div style="min-width:0;">
+                <p class="itinerary-title">${item.title}</p>
+                <p class="muted-row">🕒 ${formatTimeRange(item.startTime, item.endTime)}</p>
+              </div>
+              <span style="color:#94a3b8;">›</span>
+            </div>
+            <p class="muted-row">📍 ${item.location || '未填地點'}</p>
+            ${item.note ? `<p class="muted-row" style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:5px;">${item.note}</p>` : ''}
+            <div class="ticket-pill">🎟️ 門票 ${item.ticket || 0}</div>
+          </button>
+        </div>
+      `;
+    }
+
+    function attachItineraryCardEvents() {
+      document.querySelectorAll('.open-itinerary').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.editingItineraryId = btn.dataset.id;
+          state.screen = 'itinerary-edit';
+          render();
+        });
+      });
+    }
+
+    function attachDragAndDrop() {
+      const list = document.getElementById('itinerary-list');
+      if (!list) return;
+
+      let draggedId = null;
+      let pressTimer = null;
+      let allowDrag = false;
+
+      list.querySelectorAll('.itinerary-card').forEach((card) => {
+        const handle = card.querySelector('.drag-handle');
+
+        handle.addEventListener('pointerdown', () => {
+          pressTimer = setTimeout(() => {
+            allowDrag = true;
+            card.setAttribute('draggable', 'true');
+          }, 180);
+        });
+
+        handle.addEventListener('pointerup', () => {
+          clearTimeout(pressTimer);
+        });
+
+        handle.addEventListener('pointerleave', () => {
+          clearTimeout(pressTimer);
+        });
+
+        card.addEventListener('dragstart', (e) => {
+          if (!allowDrag) {
+            e.preventDefault();
+            return;
+          }
+          draggedId = card.dataset.id;
+          card.classList.add('dragging');
+        });
+
+        card.addEventListener('dragend', () => {
+          allowDrag = false;
+          card.classList.remove('dragging');
+          card.setAttribute('draggable', 'false');
+        });
+
+        card.addEventListener('dragover', (e) => {
+          e.preventDefault();
+        });
+
+        card.addEventListener('drop', (e) => {
+          e.preventDefault();
+          const targetId = card.dataset.id;
+          if (!draggedId || draggedId === targetId) return;
+          reorderCurrentDayItems(draggedId, targetId);
+        });
+      });
+    }
+
+    function reorderCurrentDayItems(draggedId, targetId) {
+      const trip = getSelectedTrip();
+      const dayItems = trip.itinerary.filter((item) => item.dayDate === state.selectedDay);
+      const otherItems = trip.itinerary.filter((item) => item.dayDate !== state.selectedDay);
+      const oldIndex = dayItems.findIndex((item) => item.id === draggedId);
+      const newIndex = dayItems.findIndex((item) => item.id === targetId);
+      if (oldIndex < 0 || newIndex < 0) return;
+      const moved = dayItems.splice(oldIndex, 1)[0];
+      dayItems.splice(newIndex, 0, moved);
+      trip.itinerary = [...otherItems, ...dayItems];
+      renderItinerarySection();
+    }
+
+    function renderExpensesSection() {
+      const trip = getSelectedTrip();
+      const visible = state.activeTab === 'expenses';
+      els.expensesSection.classList.toggle('hidden', !visible);
+      if (!visible) return;
+
+      els.expensesSection.innerHTML = `
+        <div class="section-header" style="margin-top:14px;">
+          <div>
+            <h3>支出明細</h3>
+            <p>支援手動新增與收據匯入</p>
+          </div>
+          <div class="tab-actions">
+            <button class="btn outline small" id="open-receipt-btn">📷</button>
+            <button class="btn small" id="open-expense-btn">＋ 新增</button>
+          </div>
+        </div>
+        <div class="list">
+          ${trip.expenses.map((expense) => renderExpenseCard(expense, trip)).join('')}
+        </div>
+      `;
+
+      document.getElementById('open-receipt-btn').addEventListener('click', () => openModal('receipt-sheet'));
+      document.getElementById('open-expense-btn').addEventListener('click', () => {
+        populateExpenseForm();
+        openModal('expense-sheet');
+      });
+    }
+
+    function renderExpenseCard(expense, trip) {
+      const member = trip.members.find((m) => m.id === expense.memberId);
+      return `
+        <div class="expense-card">
+          <div class="expense-head">
+            <div>
+              <p class="expense-name">${expense.merchant}</p>
+              <p class="expense-sub">${expense.item}</p>
+              <p class="expense-sub">${expense.date} ・ ${expense.paymentMethod} ・ ${member ? member.avatar + ' ' + member.name : ''}</p>
+            </div>
+            <div>
+              <div class="amount-foreign">${currency(expense.foreignAmount, expense.currency)}</div>
+              <div class="amount-twd">${currency(expense.twdAmount, 'TWD')}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMembersSection() {
+      const trip = getSelectedTrip();
+      const visible = state.activeTab === 'members';
+      els.membersSection.classList.toggle('hidden', !visible);
+      if (!visible) return;
+
+      const summary = memberSummary(trip);
+      els.membersSection.innerHTML = `
+        <div class="section-header" style="margin-top:14px;">
+          <div>
+            <h3>多人記帳</h3>
+            <p>可新增旅伴，也可設定一起編輯行程</p>
+          </div>
+          <button class="btn small" id="open-member-create">＋ 新增</button>
+        </div>
+        <div class="list">
+          ${summary.map((member) => renderMemberCard(member)).join('')}
+          ${renderCollabCard()}
+        </div>
+      `;
+
+      document.getElementById('open-member-create').addEventListener('click', () => {
+        state.editingMemberId = null;
+        state.selectedEmoji = emojiOptions[0];
+        document.getElementById('member-name').value = '';
+        els.deleteMemberBtn.classList.add('hidden');
+        els.memberSheetTitle.textContent = '新增旅伴';
+        renderEmojiGrid();
+        openModal('member-sheet');
+      });
+
+      document.querySelectorAll('.member-edit-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const member = trip.members.find((m) => m.id === btn.dataset.id);
+          if (!member) return;
+          state.editingMemberId = member.id;
+          state.selectedEmoji = member.avatar;
+          document.getElementById('member-name').value = member.name;
+          els.deleteMemberBtn.classList.remove('hidden');
+          els.memberSheetTitle.textContent = '編輯旅伴';
+          renderEmojiGrid();
+          openModal('member-sheet');
+        });
+      });
+
+      document.getElementById('toggle-collab-btn').addEventListener('click', () => {
+        state.collabSettings.allowInvite = !state.collabSettings.allowInvite;
+        renderMembersSection();
+      });
+    }
+
+    function renderMemberCard(member) {
+      return `
+        <div class="member-card">
+          <div class="member-head">
+            <button class="member-row-btn member-edit-btn" data-id="${member.id}">
+              <div class="member-avatar">${member.avatar}</div>
+              <div>
+                <p class="member-name">${member.name}</p>
+                <p class="member-sub">點一下可編輯資料</p>
+              </div>
+            </button>
+            <div style="font-weight:700; white-space:nowrap;">${currency(member.total, 'TWD')}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderCollabCard() {
+      return `
+        <div class="member-card">
+          <div class="row-between" style="margin-bottom:10px; align-items:center;">
+            <div>
+              <p class="member-name" style="display:flex; gap:6px; align-items:center; margin:0;">⚙️ 簡易使用者設定</p>
+              <p class="member-sub">朋友加入後，可一起編輯行程並上傳自己的發票記帳。</p>
+            </div>
+          </div>
+          <div class="invite-box">
+            <div style="font-size:12px; color:var(--muted);">邀請碼</div>
+            <div style="margin-top:4px; font-weight:700;">${state.collabSettings.inviteCode}</div>
+          </div>
+          <div class="invite-box" style="margin-top:10px;">
+            <div style="font-size:12px; color:var(--muted);">邀請連結</div>
+            <div style="margin-top:4px; word-break:break-all; font-size:14px;">${state.collabSettings.inviteLink}</div>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:10px;">
+            <button class="btn outline" style="flex:1;" id="toggle-collab-btn">${state.collabSettings.allowInvite ? '🔒 關閉共編' : '👥 開啟共編'}</button>
+            <button class="btn" style="flex:1;">🔗 複製連結</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAnalyticsSection() {
+      const trip = getSelectedTrip();
+      const visible = state.activeTab === 'analytics';
+      els.analyticsSection.classList.toggle('hidden', !visible);
+      if (!visible) return;
+
+      const trend = dailyTrend(trip);
+      const cats = categoryStats(trip);
+      const pays = paymentStats(trip);
+      const tops = topExpenses(trip);
+
+      els.analyticsSection.innerHTML = `
+        <div class="section-header" style="margin-top:14px;">
+          <div>
+            <h3>統計分析</h3>
+            <p>每日趨勢、類別佔比、支付方式、TOP 10</p>
+          </div>
+        </div>
+        <div class="analytics-card">
+          <div style="font-size:14px; font-weight:700;">每日趨勢</div>
+          <div class="chart-box">
+            ${renderLineChart(trend)}
+          </div>
+        </div>
+        <div class="analytics-grid" style="margin-top:10px;">
+          <div class="analytics-card">
+            <div style="font-size:14px; font-weight:700;">類別佔比</div>
+            <div class="chart-box">${renderPieChart(cats)}</div>
+          </div>
+          <div class="analytics-card">
+            <div style="font-size:14px; font-weight:700;">支付方式</div>
+            <div class="chart-box">${renderBarChart(pays)}</div>
+          </div>
+        </div>
+        <div class="analytics-card" style="margin-top:10px;">
+          <div style="font-size:14px; font-weight:700; margin-bottom:10px;">TOP 10 消費</div>
+          <div class="list">
+            ${tops.map((item, index) => renderTopExpense(item, index, trip)).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderLineChart(data) {
+      if (!data.length) return '<div class="fake-line"></div>';
+      const values = data.map((d) => d.amount);
+      const max = Math.max(...values, 1);
+      const width = 280;
+      const height = 160;
+      const stepX = width / Math.max(data.length - 1, 1);
+      const points = data.map((d, i) => {
+        const x = i * stepX;
+        const y = height - (d.amount / max) * 120 - 12;
+        return `${x},${y}`;
+      }).join(' ');
+      return `
+        <div class="fake-line">
+          <svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
+            <polyline fill="none" stroke="#8d9b8a" stroke-width="4" points="${points}" />
+          </svg>
+        </div>
+      `;
+    }
+
+    function renderPieChart(data) {
+      if (!data.length) return '<div class="fake-pie"></div>';
+      let total = data.reduce((s, d) => s + d.value, 0) || 1;
+      let start = 0;
+      const segments = data.map((d, index) => {
+        const size = d.value / total;
+        const end = start + size;
+        const large = end - start > 0.5 ? 1 : 0;
+        const x1 = 100 + 55 * Math.cos(2 * Math.PI * start - Math.PI / 2);
+        const y1 = 100 + 55 * Math.sin(2 * Math.PI * start - Math.PI / 2);
+        const x2 = 100 + 55 * Math.cos(2 * Math.PI * end - Math.PI / 2);
+        const y2 = 100 + 55 * Math.sin(2 * Math.PI * end - Math.PI / 2);
+        const path = `M100 100 L${x1} ${y1} A55 55 0 ${large} 1 ${x2} ${y2} Z`;
+        start = end;
+        return `<path d="${path}" fill="${chartColors[index % chartColors.length]}"></path>`;
+      }).join('');
+      return `
+        <div class="fake-pie">
+          <svg viewBox="0 0 200 200">${segments}<circle cx="100" cy="100" r="26" fill="#fff"></circle></svg>
+        </div>
+      `;
+    }
+
+    function renderBarChart(data) {
+      if (!data.length) return '<div class="fake-bars"></div>';
+      const max = Math.max(...data.map((d) => d.amount), 1);
+      const width = 280;
+      const height = 160;
+      const barWidth = Math.max(26, Math.floor(width / (data.length * 1.8)));
+      const gap = Math.floor((width - barWidth * data.length) / (data.length + 1));
+      const bars = data.map((d, index) => {
+        const h = Math.max(18, (d.amount / max) * 110);
+        const x = gap + index * (barWidth + gap);
+        const y = height - h - 12;
+        return `<rect x="${x}" y="${y}" rx="10" ry="10" width="${barWidth}" height="${h}" fill="#a5a58d"></rect>`;
+      }).join('');
+      return `
+        <div class="fake-bars">
+          <svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">${bars}</svg>
+        </div>
+      `;
+    }
+
+    function renderTopExpense(item, index, trip) {
+      const member = trip.members.find((m) => m.id === item.memberId);
+      return `
+        <div class="top-expense-row">
+          <div style="display:flex; gap:10px; min-width:0;">
+            <div class="rank">${index + 1}</div>
+            <div>
+              <p class="top-expense-name">${item.merchant}</p>
+              <p class="top-expense-sub">${item.item} ・ ${member ? member.avatar + ' ' + member.name : ''}</p>
+            </div>
+          </div>
+          <div style="white-space:nowrap; font-weight:700;">${currency(item.twdAmount, 'TWD')}</div>
+        </div>
+      `;
+    }
+
+    function renderEditScreen() {
+      const trip = getSelectedTrip();
+      const item = trip.itinerary.find((it) => it.id === state.editingItineraryId);
+      if (!item) {
+        state.screen = 'home';
+        render();
+        return;
+      }
+
+      els.editScreen.classList.remove('hidden-screen');
+      els.homeScreen.classList.add('hidden-screen');
+
+      els.editScreen.innerHTML = `
+        <div class="topbar" style="margin-bottom:12px;">
+          <button class="btn outline" id="back-home-btn">← 返回</button>
+          <div class="badge" style="background:#efe8df; color:#6b5e55;">✏️ 行程編輯</div>
+        </div>
+        <div class="preview-box">
+          <div class="section-header" style="margin-bottom:8px;">
+            <div>
+              <h3>行程預覽</h3>
+              <p>先看摘要，再調整內容</p>
+            </div>
+          </div>
+          <div class="card" style="padding:12px; box-shadow:var(--shadow-sm);">
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              <span class="badge" style="background:#fff; color:#4b5563;">${formatMonthDay(item.dayDate)}</span>
+              <span class="badge" style="background:#fff; color:#4b5563;">${formatTimeRange(item.startTime, item.endTime)}</span>
+            </div>
+            <p style="margin:10px 0 0; font-size:16px; font-weight:700;">${item.title || '未命名行程'}</p>
+            <p class="muted-row" style="margin-top:6px;">📍 ${item.location || '未填地點'}</p>
+            ${item.note ? `<p style="margin:8px 0 0; font-size:14px; line-height:1.6; color:#4b5563;">${item.note}</p>` : ''}
+            <div class="ticket-pill" style="margin-top:8px;">門票 ${item.ticket || 0}</div>
+          </div>
+        </div>
+        <div class="card" style="padding:14px; margin-top:12px; border:1px solid var(--border);">
+          <div class="section-header" style="margin-bottom:8px;"><h3 style="margin:0;">編輯內容</h3></div>
+          <div class="form-grid">
+            <div class="field"><label>行程名稱</label><input class="input" id="edit-title" value="${escapeHtml(item.title)}" /></div>
+            <div class="field"><label>所在天數</label><select class="select" id="edit-day">${trip.dayPlans.map((day) => `<option value="${day}" ${day === item.dayDate ? 'selected' : ''}>${formatMonthDay(day)}</option>`).join('')}</select></div>
+            <div class="form-row-2">
+              <div class="field"><label>開始時間</label><input type="time" class="input" id="edit-start" value="${item.startTime}" /></div>
+              <div class="field"><label>結束時間</label><input type="time" class="input" id="edit-end" value="${item.endTime}" /></div>
+            </div>
+            <div class="field"><label>地點</label><input class="input" id="edit-location" value="${escapeHtml(item.location)}" /></div>
+            <div class="field"><label>門票</label><input type="number" class="input" id="edit-ticket" value="${item.ticket}" /></div>
+            <div class="field"><label>備註</label><textarea class="textarea" id="edit-note">${escapeHtml(item.note)}</textarea></div>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;">
+          <button class="btn outline" id="delete-itinerary-btn">🗑️ 刪除</button>
+          <button class="btn" id="save-itinerary-edit-btn">💾 完成編輯</button>
+        </div>
+      `;
+
+      document.getElementById('back-home-btn').addEventListener('click', () => {
+        state.screen = 'home';
+        state.editingItineraryId = null;
+        render();
+      });
+
+      document.getElementById('delete-itinerary-btn').addEventListener('click', () => {
+        trip.itinerary = trip.itinerary.filter((it) => it.id !== item.id);
+        state.screen = 'home';
+        state.editingItineraryId = null;
+        render();
+      });
+
+      document.getElementById('save-itinerary-edit-btn').addEventListener('click', () => {
+        item.title = document.getElementById('edit-title').value.trim();
+        item.dayDate = document.getElementById('edit-day').value;
+        item.startTime = document.getElementById('edit-start').value;
+        item.endTime = document.getElementById('edit-end').value;
+        item.location = document.getElementById('edit-location').value.trim();
+        item.ticket = Number(document.getElementById('edit-ticket').value || 0);
+        item.note = document.getElementById('edit-note').value.trim();
+        state.selectedDay = item.dayDate;
+        state.screen = 'home';
+        state.editingItineraryId = null;
+        render();
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function populateExpenseForm() {
+      const trip = getSelectedTrip();
+      const categoryEl = document.getElementById('expense-category');
+      const paymentEl = document.getElementById('expense-payment');
+      const memberEl = document.getElementById('expense-member');
+      categoryEl.innerHTML = categories.map((item) => `<option value="${item}">${item}</option>`).join('');
+      paymentEl.innerHTML = payments.map((item) => `<option value="${item}">${item}</option>`).join('');
+      memberEl.innerHTML = trip.members.map((member) => `<option value="${member.id}">${member.avatar} ${member.name}</option>`).join('');
+      memberEl.value = trip.members[0]?.id || '';
+    }
+
+    function populateItineraryDayOptions() {
+      const trip = getSelectedTrip();
+      const select = document.getElementById('new-itinerary-day');
+      select.innerHTML = trip.dayPlans.map((day) => `<option value="${day}">${formatMonthDay(day)}</option>`).join('');
+      select.value = state.selectedDay || trip.dayPlans[0] || '';
+    }
+
+    function renderEmojiGrid() {
+      els.emojiGrid.innerHTML = emojiOptions.map((emoji) => `
+        <button class="emoji-btn ${state.selectedEmoji === emoji ? 'active' : ''}" data-emoji="${emoji}">${emoji}</button>
+      `).join('');
+      els.emojiGrid.querySelectorAll('[data-emoji]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.selectedEmoji = btn.dataset.emoji;
+          renderEmojiGrid();
+        });
+      });
+    }
+
+    function updateDayPreview() {
+      const value = document.getElementById('new-day-date').value;
+      els.dayPreviewBox.textContent = value ? `將新增：${formatMonthDay(value)}` : '請選擇日期';
+    }
+
+    function renderReceiptPreview() {
+      if (!state.receiptImageUrl) {
+        els.receiptPreviewBox.textContent = '尚未選擇收據';
+        return;
+      }
+      els.receiptPreviewBox.innerHTML = `<img src="${state.receiptImageUrl}" alt="receipt" style="max-width:100%; max-height:160px; border-radius:16px; object-fit:contain; display:block; margin:0 auto;" />`;
+    }
+
+    function renderTripMenuList() {
+      const trip = getSelectedTrip();
+      els.tripMenuList.innerHTML = state.trips.map((item) => `
+        <button class="trip-list-item ${item.id === trip.id ? 'active' : ''}" data-trip-id="${item.id}">
+          <div class="row-between">
+            <div>
+              <div style="font-weight:700; color:#111827;">${item.title}</div>
+              <div style="margin-top:2px; font-size:11px; color:#6b7280;">${item.startDate} ～ ${item.endDate}</div>
+            </div>
+            <span class="badge" style="background:#fff; color:#4b5563; border:1px solid var(--border);">${item.currency}</span>
+          </div>
+        </button>
+      `).join('');
+      els.tripMenuList.querySelectorAll('[data-trip-id]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.selectedTripId = btn.dataset.tripId;
+          const trip = getSelectedTrip();
+          state.selectedDay = trip.dayPlans[0] || '';
+          closeModal('trip-menu-sheet');
+          render();
+        });
+      });
+    }
+
+    function render() {
+      if (state.screen === 'itinerary-edit') {
+        document.getElementById('bottom-nav').classList.add('hidden');
+        renderEditScreen();
+        return;
+      }
+
+      document.getElementById('bottom-nav').classList.remove('hidden');
+      els.homeScreen.classList.remove('hidden-screen');
+      els.editScreen.classList.add('hidden-screen');
+
+      renderBottomNav();
+      renderCurrentTrip();
+      renderFlightSection();
+      renderItinerarySection();
+      renderExpensesSection();
+      renderMembersSection();
+      renderAnalyticsSection();
+      renderTripMenuList();
+      renderEmojiGrid();
+      updateDayPreview();
+      renderReceiptPreview();
+    }
+
+    document.getElementById('open-trip-menu').addEventListener('click', () => openModal('trip-menu-sheet'));
+    document.getElementById('open-add-trip-dialog').addEventListener('click', () => openModal('trip-dialog'));
+
+    document.querySelectorAll('[data-close]').forEach((node) => {
+      node.addEventListener('click', () => closeModal(node.dataset.close));
+    });
+
+    document.getElementById('submit-add-trip').addEventListener('click', () => {
+      const title = document.getElementById('trip-title').value.trim();
+      const startDate = document.getElementById('trip-start-date').value;
+      const endDate = document.getElementById('trip-end-date').value;
+      const currencyCode = document.getElementById('trip-currency').value;
+      const fxRate = Number(document.getElementById('trip-fx-rate').value || 0.22);
+      if (!title) return;
+      const id = `trip-${Date.now()}`;
+      const startDay = startDate || new Date().toISOString().slice(0, 10);
+      state.trips.unshift({
+        id,
+        title,
+        startDate,
+        endDate,
+        dayPlans: [startDay],
+        ticketInfo: {
+          outbound: { ...structuredClone(initialTrips[0].ticketInfo.outbound) },
+          inbound: { ...structuredClone(initialTrips[0].ticketInfo.inbound) },
+        },
+        currency: currencyCode,
+        fxRate,
+        members: structuredClone(initialTrips[0].members),
+        itinerary: [],
+        expenses: [],
+      });
+      state.selectedTripId = id;
+      state.selectedDay = startDay;
+      document.getElementById('trip-title').value = '';
+      document.getElementById('trip-start-date').value = '';
+      document.getElementById('trip-end-date').value = '';
+      document.getElementById('trip-currency').value = 'JPY';
+      document.getElementById('trip-fx-rate').value = '0.22';
+      closeModal('trip-dialog');
+      render();
+    });
+
+    document.getElementById('save-day-btn').addEventListener('click', () => {
+      const trip = getSelectedTrip();
+      const value = document.getElementById('new-day-date').value;
+      if (!value || trip.dayPlans.includes(value)) return;
+      trip.dayPlans.push(value);
+      trip.dayPlans.sort();
+      state.selectedDay = value;
+      document.getElementById('new-day-date').value = '';
+      updateDayPreview();
+      closeModal('day-sheet');
+      render();
+    });
+
+    document.getElementById('new-day-date').addEventListener('input', updateDayPreview);
+
+    document.getElementById('save-ticket-btn').addEventListener('click', () => {
+      const trip = getSelectedTrip();
+      document.querySelectorAll('.ticket-input').forEach((input) => {
+        const round = input.dataset.round;
+        const key = input.dataset.key;
+        trip.ticketInfo[round][key] = input.value;
+      });
+      closeModal('ticket-sheet');
+      render();
+    });
+
+    document.getElementById('save-itinerary-btn').addEventListener('click', () => {
+      const trip = getSelectedTrip();
+      const title = document.getElementById('new-itinerary-title').value.trim();
+      const dayDate = document.getElementById('new-itinerary-day').value;
+      if (!title || !dayDate) return;
+      trip.itinerary.push({
+        id: `it-${Date.now()}`,
+        title,
+        dayDate,
+        startTime: document.getElementById('new-itinerary-start').value,
+        endTime: document.getElementById('new-itinerary-end').value,
+        location: document.getElementById('new-itinerary-location').value.trim(),
+        note: document.getElementById('new-itinerary-note').value.trim(),
+        ticket: Number(document.getElementById('new-itinerary-ticket').value || 0),
+      });
+      state.selectedDay = dayDate;
+      document.getElementById('new-itinerary-title').value = '';
+      document.getElementById('new-itinerary-start').value = '';
+      document.getElementById('new-itinerary-end').value = '';
+      document.getElementById('new-itinerary-location').value = '';
+      document.getElementById('new-itinerary-note').value = '';
+      document.getElementById('new-itinerary-ticket').value = '0';
+      closeModal('itinerary-sheet');
+      render();
+    });
+
+    document.getElementById('save-expense-btn').addEventListener('click', () => {
+      const trip = getSelectedTrip();
+      const foreignAmount = Number(document.getElementById('expense-foreign').value || 0);
+      trip.expenses.unshift({
+        id: `ex-${Date.now()}`,
+        date: document.getElementById('expense-date').value,
+        merchant: document.getElementById('expense-merchant').value.trim(),
+        item: document.getElementById('expense-item').value.trim(),
+        category: document.getElementById('expense-category').value,
+        foreignAmount,
+        currency: trip.currency,
+        twdAmount: Math.round(foreignAmount * Number(trip.fxRate || 1)),
+        paymentMethod: document.getElementById('expense-payment').value,
+        memberId: document.getElementById('expense-member').value,
+        note: document.getElementById('expense-note').value.trim(),
+      });
+      document.getElementById('expense-date').value = '';
+      document.getElementById('expense-merchant').value = '';
+      document.getElementById('expense-item').value = '';
+      document.getElementById('expense-foreign').value = '';
+      document.getElementById('expense-note').value = '';
+      closeModal('expense-sheet');
+      render();
+    });
+
+    document.getElementById('receipt-file').addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      state.receiptImageUrl = URL.createObjectURL(file);
+      renderReceiptPreview();
+    });
+
+    document.getElementById('save-receipt-btn').addEventListener('click', () => {
+      const trip = getSelectedTrip();
+      trip.expenses.unshift({
+        id: `ex-${Date.now()}`,
+        date: new Date().toISOString().slice(0, 10),
+        merchant: document.getElementById('receipt-merchant').value.trim() || '未命名店家',
+        item: document.getElementById('receipt-item').value.trim(),
+        category: '餐飲',
+        foreignAmount: Number(document.getElementById('receipt-foreign').value || 0),
+        currency: trip.currency,
+        twdAmount: Number(document.getElementById('receipt-twd').value || 0),
+        paymentMethod: '信用卡',
+        memberId: trip.members[0]?.id || '',
+        note: document.getElementById('receipt-note').value.trim(),
+      });
+      document.getElementById('receipt-merchant').value = '';
+      document.getElementById('receipt-item').value = '';
+      document.getElementById('receipt-foreign').value = '';
+      document.getElementById('receipt-twd').value = '';
+      document.getElementById('receipt-note').value = '';
+      document.getElementById('receipt-file').value = '';
+      state.receiptImageUrl = null;
+      renderReceiptPreview();
+      closeModal('receipt-sheet');
+      render();
+    });
+
+    document.getElementById('save-member-btn').addEventListener('click', () => {
+      const trip = getSelectedTrip();
+      const name = document.getElementById('member-name').value.trim();
+      if (!name) return;
+      if (state.editingMemberId) {
+        const member = trip.members.find((m) => m.id === state.editingMemberId);
+        if (member) {
+          member.name = name;
+          member.avatar = state.selectedEmoji;
+        }
+      } else {
+        trip.members.push({ id: `m-${Date.now()}`, name, avatar: state.selectedEmoji });
+      }
+      state.editingMemberId = null;
+      document.getElementById('member-name').value = '';
+      closeModal('member-sheet');
+      render();
+    });
+
+    document.getElementById('delete-member-btn').addEventListener('click', () => {
+      if (!state.editingMemberId) return;
+      const trip = getSelectedTrip();
+      const fallback = trip.members.find((m) => m.id !== state.editingMemberId)?.id || '';
+      trip.members = trip.members.filter((m) => m.id !== state.editingMemberId);
+      trip.expenses = trip.expenses.map((expense) => expense.memberId === state.editingMemberId ? { ...expense, memberId: fallback } : expense);
+      state.editingMemberId = null;
+      closeModal('member-sheet');
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
